@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>EF1D54AB-AA37-4D49-B35F-3AD8D7D8067B</string>
+	<key>IDESourceControlProjectName</key>
+	<string>PanaCloud Wow</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>179F887914467ABBA7582A0D74E8FD4A972FAE83</key>
+		<string>https://github.com/mmohsin991/PanaCloud-Wow.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>PanaCloud Wow.xcodeproj</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>179F887914467ABBA7582A0D74E8FD4A972FAE83</key>
+		<string>../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>https://github.com/mmohsin991/PanaCloud-Wow.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>111</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>179F887914467ABBA7582A0D74E8FD4A972FAE83</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>179F887914467ABBA7582A0D74E8FD4A972FAE83</string>
+			<key>IDESourceControlWCCName</key>
+			<string>PanaCloud%20Wow</string>
+		</dict>
+	</array>
+</dict>
+</plist>
