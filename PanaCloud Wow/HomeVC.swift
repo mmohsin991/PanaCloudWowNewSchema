@@ -33,12 +33,17 @@ class HomeVC: WowUIViewController, UITableViewDataSource, UITableViewDelegate, U
     
     @IBOutlet weak var tabBar: UITabBar!
     
-    var ownersList = [String: [NSObject : AnyObject] ]()
+    var ownersList = [String: AnyObject]()
     var subscriberList = [String: [NSObject : AnyObject] ]()
+    
 
     var tableType = "SPACES"
-    var tempNotification = [String: [NSObject : AnyObject] ]()
 
+    var tempSpaceIDs = [ "shezispace1" , "space1"]
+    var tempNotification = [String: AnyObject]()
+
+    
+    
     
     
     override func viewDidLoad() {
@@ -46,33 +51,40 @@ class HomeVC: WowUIViewController, UITableViewDataSource, UITableViewDelegate, U
         
         self.scrollView.contentSize = self.containerView.frame.size
 
+        if loginUser == nil {
+            loginUser = User(ref: "", uID: "zia", email: "ziaukhan@hotmail.com", firstName: "Zia", lastName: "Khan", status: "verified")
+        }
         
-        // temp loaded data
-        self.tempNotification = [
-            "Not1" : ["title":"Notification1", "desc":"do some thing 1"],
-            "Not2" : ["title":"Notification2", "desc":"do some thing 2"],
-            "Not3" : ["title":"Notification3", "desc":"do some thing 3"],
-            "Not4" : ["title":"Notification4", "desc":"do some thing 4"],
-            "Not5" : ["title":"Notification5", "desc":"do some thing 5"],
-            "Not6" : ["title":"Notification6", "desc":"do some thing 6"],
-            "Not7" : ["title":"Notification7", "desc":"do some thing 7"],
-            "Not8" : ["title":"Notification8", "desc":"do some thing 8"],
-            "Not9" : ["title":"Notification9", "desc":"do some thing 9"],
-            "Not10" : ["title":"Notification10", "desc":"do some thing 10"],
-            "Not11" : ["title":"Notification11", "desc":"do some thing 11"]]
+        let refPanacloudActivities = Firebase(url: "https://panacloud1.firebaseio.com/space-activity-streams/panacloud")
+//        let notification = AsyncArray(ref: refPanacloudActivities) { (dataArray) -> Void in
+//            println(dataArray.count)
+//            println(dataArray)
+//        }
+    
         
-
-        self.ownersList = [
-            "Not1" : ["title":"Orginization1", "desc":"do some thing 1"],
-            "Not2" : ["title":"Orginization2", "desc":"do some thing 2"],
-        ]
+        let notifications = AsyncObject(ref: refPanacloudActivities) { (data, updateKey) -> Void in
+            
+            if data != nil {
+                self.tempNotification = data!
+                println(updateKey)
+                
+                self.orgTableView.reloadData()
+                
+                // stop and hide the loading indicators
+                self.loadingInd.stopAnimating()
+                self.loadingLbl.hidden = true
+            }
+            
+        }
         
-        
-        self.subscriberList = [
-            "Not1" : ["title":"Orginization1", "desc":"do some thing 1"],
-            "Not2" : ["title":"Orginization2", "desc":"do some thing 2"],
-            "Not3" : ["title":"Orginization3", "desc":"do some thing 3"],
-        ]
+        //
+        asyncSpaceDesc(tempSpaceIDs, { (spacesDesc) -> Void in
+            self.ownersList = spacesDesc
+            
+            println(spacesDesc)
+            
+            self.orgTableView.reloadData()
+        })
         
         
         // table view configurations
@@ -112,9 +124,7 @@ class HomeVC: WowUIViewController, UITableViewDataSource, UITableViewDelegate, U
 //         })
         
     
-        if loginUser == nil {
-            loginUser = User(ref: "", uID: "shezi", email: "shahzadscs@gmail.com", firstName: "Shahzad", lastName: "Soomro", status: "pending")
-        }
+
 //        
 //            loginUser?.asynGetSubscriberOrgs({ (orgList) -> Void in
 //                if orgList != nil {
@@ -188,8 +198,12 @@ class HomeVC: WowUIViewController, UITableViewDataSource, UITableViewDelegate, U
         // if orgs TableView comes
         if self.tableType == "SPACES" {
             if indexPath.row < self.ownersList.keys.array.count {
-                cell.textLabel?.text = self.ownersList.values.array[indexPath.row]["title"] as NSString
-                cell.detailTextLabel?.text = self.ownersList.values.array[indexPath.row]["desc"] as NSString
+                if self.ownersList.values.array[indexPath.row]["title"] != nil {
+                    cell.textLabel?.text = self.ownersList.values.array[indexPath.row]["title"] as NSString
+                }
+                if self.ownersList.values.array[indexPath.row]["desc"] != nil {
+                    cell.detailTextLabel?.text = self.ownersList.values.array[indexPath.row]["desc"] as NSString
+                }
             }
             else {
                 let tempIndexRow = indexPath.row - self.ownersList.keys.array.count
@@ -205,8 +219,8 @@ class HomeVC: WowUIViewController, UITableViewDataSource, UITableViewDelegate, U
         // if notification TableView comes
         else if self.tableType == "NOTIFICATIONS"{
             
-                cell.textLabel?.text = self.tempNotification.values.array[indexPath.row]["title"] as NSString
-                cell.detailTextLabel?.text = self.tempNotification.values.array[indexPath.row]["desc"] as NSString
+                cell.textLabel?.text = self.tempNotification.values.array[indexPath.row]["verb"] as NSString
+                cell.detailTextLabel?.text = self.tempNotification.values.array[indexPath.row]["displayName"] as NSString
             
             
             cell.imageView?.image = UIImage(named: "notification")
@@ -291,6 +305,8 @@ class HomeVC: WowUIViewController, UITableViewDataSource, UITableViewDelegate, U
 
         println(item.title!)
     }
+    
+    
 
     @IBAction func rightMenu(sender: AnyObject) {
         delegate?.toggleRightPanel!()

@@ -11,9 +11,9 @@ import UIKit
 class UserVC: UIViewController {
     
     
-    var uID = "@mmohsin"
-    var name = "Muhammad Mohsin"
-    var desc = "I am going good"
+    var uID = ""
+    var name = ""
+    var email = ""
 
     
     @IBOutlet weak var lblName: UILabel!
@@ -21,20 +21,19 @@ class UserVC: UIViewController {
     @IBOutlet weak var lblUserInfo: UILabel!
     
     
-    let userRef = Firebase(url: "https://panacloud1.firebaseio.com/users/mmohsin")
+    let userRef = Firebase(url: "https://panacloud1.firebaseio.com/users/\(loginUser?.uID)")
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         self.lblName.text = self.name
         self.lblUID.text = self.uID
-        self.lblUserInfo.text = self.desc
+        self.lblUserInfo.text = self.email
         
         
-        var asyncObject = AsyncObject(ref: userRef) { (data) -> Void in
-            println(data)
-            self.uiUpdate(data)
-
+        var asyncObject = AsyncObject(ref: self.userRef) { (data, updateKey) -> Void in
+            if data != nil {
+                self.uiUpdate(data!)
+            }
         }
 
     }
@@ -48,12 +47,23 @@ class UserVC: UIViewController {
         
         self.lblUID.text = "@\(self.userRef.key)"
         
+        var fName = String()
+        var lName = String()
         
-        let fName = data["firstName"] as NSString
-        let lName = data["lastName"] as NSString
+        if data["firstName"] != nil {
+            fName = data["firstName"] as NSString
+            self.lblName.text = "\(fName) \(lName)"
+
+        }
+        if data["lastName"] != nil {
+            lName = data["lastName"] as NSString
+            self.lblName.text = "\(fName) \(lName)"
+        }
+        if data["email"] != nil {
+            self.lblUserInfo.text = data["email"] as NSString
+
+        }
     
-        self.lblName.text = "\(fName) \(lName)"
-        self.lblUserInfo.text = data["email"] as NSString
         
     }
     /*
@@ -66,6 +76,7 @@ class UserVC: UIViewController {
     }
     */
     @IBAction func back(sender: UIBarButtonItem) {
+        self.userRef.removeAllObservers()
         self.dismissViewControllerAnimated(true, completion: nil)
     }
 

@@ -259,7 +259,7 @@ class User{
     var lastName: String
     var status: String
     // user's member owner list
-    var members: [String : Int]?
+    var members: [String : AnyObject]?
     var owner: [String: [String: String]]?
     
     
@@ -286,20 +286,19 @@ class User{
     }
     
     // retrive user's owner list and subcrober org list its a async method
-    func asyncSetOwnerMemberList(callBack : () -> Void){
+    func asyncSetOwnerMemberList(callBack : (members: [String : AnyObject]?) -> Void){
         
-        let ownerRef = WowRef.ref.childByAppendingPath("users/\(self.uID)")
+        let ownerRef = WowRef.ref.childByAppendingPath("user-memberships/\(self.uID)")
         
         ownerRef.observeEventType(FEventType.Value, withBlock: { snapshot in
             
             if !(snapshot.value is NSNull) {
-                self.owner = snapshot.value["owner"] as? [String : [String : String]]
-                self.members = snapshot.value["member"] as? [String : Int]
-                callBack()
+                self.members = snapshot.value as? [String : AnyObject]
+                callBack(members: self.members)
             }
             
             else {
-                callBack()
+                callBack(members: nil)
             }
         })
     }
@@ -312,7 +311,7 @@ class User{
         
         var countReturn = 0
         
-            self.asyncSetOwnerMemberList({ () -> Void in
+            self.asyncSetOwnerMemberList({ (members) -> Void in
                 
                 // if no subscriber orgs user have
                 if self.members == nil {
@@ -362,7 +361,7 @@ class User{
         
         var countReturn = 0
         
-            self.asyncSetOwnerMemberList({ () -> Void in
+            self.asyncSetOwnerMemberList({ (members) -> Void in
                 
                 // if no owner orgs user have
                 if self.owner == nil {
@@ -472,7 +471,7 @@ class WowRef {
     
     private class var ref : Firebase {
         struct Static {
-            static let tempRef : Firebase = Firebase(url: "https://sweltering-inferno-1689.firebaseio.com/")
+            static let tempRef : Firebase = Firebase(url: "https://panacloud1.firebaseio.com/")
         }
         return Static.tempRef
     }
@@ -866,18 +865,127 @@ class AsyncObject{
     private var data = [String : AnyObject]()
     let ref : Firebase
     
-    init(ref: Firebase, callBack : (data : [String : AnyObject]) -> Void){
+    init(ref: Firebase, callBack : (data : [String : AnyObject]?, updateKey : String?) -> Void){
         self.ref = ref
         
-        self.ref.observeEventType(FEventType.Value, withBlock: { (snapshot) -> Void in
-            self.data = snapshot.value as [String : AnyObject]
-            callBack(data: self.data)
+        // use Value Event type
+//        self.ref.observeEventType(FEventType.Value, withBlock: { (snapshot) -> Void in
+//            self.data = snapshot.value as [String : AnyObject]
+//            callBack(data: self.data)
+//        })
+        
+        // if child added
+        self.ref.observeEventType(FEventType.ChildAdded, withBlock: { (snapshot) -> Void in
+            if !(snapshot.value is NSNull) {
+            self.data[snapshot.key] = snapshot.value as AnyObject
+            callBack(data: self.data, updateKey: snapshot.key)
+            }
+            else {
+                callBack(data: nil, updateKey: nil)
+            }
         })
         
+        // if child value changed
+        self.ref.observeEventType(FEventType.ChildChanged, withBlock: { (snapshot) -> Void in
+            if !(snapshot.value is NSNull) {
+            self.data[snapshot.key] = snapshot.value as AnyObject
+            callBack(data: self.data, updateKey: snapshot.key)
+            }
+            else {
+                callBack(data: nil, updateKey: nil)
+            }
+        })
+        
+        // if child deleted
+        self.ref.observeEventType(FEventType.ChildRemoved, withBlock: { (snapshot) -> Void in
+            if !(snapshot.value is NSNull) {
+            self.data.removeValueForKey(snapshot.key)
+            callBack(data: self.data, updateKey: snapshot.key)
+            }
+            else {
+                callBack(data: nil, updateKey: nil)
+            }
+        })
     }
-    
     
 }
 
+
+
+
+class AsyncArray {
+    
+    private var data = [String : AnyObject]()
+    unowned let ref : Firebase
+    
+    init(ref: Firebase, callBack : (dataArray : [AnyObject]?) -> Void){
+        self.ref = ref
+        
+        // use Value Event type
+        //        self.ref.observeEventType(FEventType.Value, withBlock: { (snapshot) -> Void in
+        //            self.data = snapshot.value as [String : AnyObject]
+        //            callBack(data: self.data)
+        //        })
+        
+        // if child added
+        self.ref.observeEventType(FEventType.ChildAdded, withBlock: { (snapshot) -> Void in
+            
+            if !(snapshot.value is NSNull) {
+                self.data[snapshot.key] = snapshot.value as AnyObject
+                callBack(dataArray: self.data.values.array)
+            }
+            else {
+                callBack(dataArray: nil)
+            }
+
+        })
+        
+        // if child value changed
+        self.ref.observeEventType(FEventType.ChildChanged, withBlock: { (snapshot) -> Void in
+        if !(snapshot.value is NSNull) {
+            self.data[snapshot.key] = snapshot.value as AnyObject
+            callBack(dataArray: self.data.values.array)
+            }
+        else {
+            callBack(dataArray: nil)
+            }
+        })
+        
+        
+        // if child deleted
+        self.ref.observeEventType(FEventType.ChildRemoved, withBlock: { (snapshot) -> Void in
+        if !(snapshot.value is NSNull) {
+            self.data.removeValueForKey(snapshot.key)
+            callBack(dataArray: self.data.values.array)
+            
+            }
+        else {
+            callBack(dataArray: nil)
+            }
+        })
+    }
+}
+
+
+func asyncSpaceDesc(spaceIDs: [String],  callBack: (spaceDesc: [String : AnyObject]) -> Void ){
+    
+    var localSpacesDesc = [String : AnyObject]()
+    var count = 0
+    
+    for spaceID in spaceIDs {
+        let tempRef = Firebase(url: "https://panacloud1.firebaseio.com/orgs/\(spaceID)")
+        
+        tempRef.observeEventType(FEventType.Value, withBlock: { (snapshot) -> Void in
+            
+            localSpacesDesc[snapshot.key] = snapshot.value
+            
+            count++
+            // when all org desc data arived
+            if count == spaceIDs.count {
+                callBack(spaceDesc: localSpacesDesc)
+            }
+        })
+    }
+}
 
 
