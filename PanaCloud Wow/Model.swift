@@ -259,8 +259,7 @@ class User{
     var lastName: String
     var status: String
     // user's member owner list
-    var members: [String : AnyObject]?
-    var owner: [String: [String: String]]?
+    var spaces: [String : AnyObject]?
     
     
     
@@ -277,24 +276,23 @@ class User{
         
     }
     
-    convenience init(ref: String, uID: String, email: String, firstName: String, lastName: String, status: String, members: [String : Int], owner: [String: [String: String]]){
+    convenience init(ref: String, uID: String, email: String, firstName: String, lastName: String, status: String, spaces: [String : Int], owner: [String: [String: String]]){
 
         self.init(ref: ref, uID: uID, email: email, firstName: firstName, lastName: lastName, status: status)
         
-        self.members = members
-        self.owner = owner
+        self.spaces = spaces
     }
     
     // retrive user's owner list and subcrober org list its a async method
-    func asyncSetOwnerMemberList(callBack : (members: [String : AnyObject]?) -> Void){
+    func asyncGetMemberList(callBack : (members: [String : AnyObject]?) -> Void){
         
         let ownerRef = WowRef.ref.childByAppendingPath("user-memberships/\(self.uID)")
         
         ownerRef.observeEventType(FEventType.Value, withBlock: { snapshot in
             
             if !(snapshot.value is NSNull) {
-                self.members = snapshot.value as? [String : AnyObject]
-                callBack(members: self.members)
+                self.spaces = snapshot.value as? [String : AnyObject]
+                callBack(members: self.spaces)
             }
             
             else {
@@ -304,106 +302,24 @@ class User{
     }
     
     
-    // retrive whole suborgs by org's ids
-    func asynGetSubscriberOrgs(callBack: (orgList: [String: [NSObject : AnyObject] ]?) -> Void){
-        let orgsRef = WowRef.ref.childByAppendingPath("orgs")
-        var tempOrgsList = [String: [NSObject : AnyObject] ]()
+    func asyncGetActivityStream(callBack : (activities: [String : AnyObject]?) -> Void){
+        var tempActivities = [String : AnyObject]()
+        var count = 0
         
-        var countReturn = 0
-        
-            self.asyncSetOwnerMemberList({ (members) -> Void in
-                
-                // if no subscriber orgs user have
-                if self.members == nil {
-                    callBack(orgList: nil)
-                    return
-                }
-                
-                // loop to all orgs
-                for x in 0..<self.members!.keys.array.count {
-                    orgsRef.childByAppendingPath(self.members!.keys.array[x]).observeSingleEventOfType(.Value, withBlock: { snapshot in
-                        
-                        // if org exast against its org id
-                        if !(snapshot.value is NSNull) {
-                            tempOrgsList[self.members!.keys.array[x]] = snapshot.value as? [NSObject : AnyObject]
-                            
-                            countReturn++
-                            // when all orgs return then callback
-                            if countReturn == self.members!.keys.array.count {
-                                callBack(orgList: tempOrgsList)
-                                countReturn = 0
-                                return
-                            }
-                            
-                        }
-                            // if org is not exast against its org id
-                        else{
-                            countReturn++
-                            // when all orgs return then callback
-                            if countReturn == self.members!.keys.array.count {
-                                callBack(orgList: tempOrgsList)
-                                countReturn = 0
-                                return
-                            }
-                        }
-                    })
-                    
-                }
-                
-            })
-            
-    }
+        if self.spaces != nil {
+            for space in self.spaces!.keys.array {
+                WowRef.ref.childByAppendingPath("space-activity-streams/\(space)").observeEventType(FEventType.ChildAdded, withBlock: { (snapshot) -> Void in
+                   tempActivities[snapshot.key] = snapshot.value
 
-    // retrive whole orgs by org's ids
-    func asynGetOwnerOrgs(callBack: (orgList: [String: [NSObject : AnyObject] ]?) -> Void){
-        let orgsRef = WowRef.ref.childByAppendingPath("orgs")
-        var tempOrgsList = [String: [NSObject : AnyObject] ]()
-        
-        var countReturn = 0
-        
-            self.asyncSetOwnerMemberList({ (members) -> Void in
-                
-                // if no owner orgs user have
-                if self.owner == nil {
-                    callBack(orgList: nil)
-                    return
-                }
-                
-                // loop to all orgs
-                for x in 0..<self.owner!.keys.array.count {
-                    orgsRef.childByAppendingPath(self.owner!.keys.array[x]).observeSingleEventOfType(.Value, withBlock: { snapshot in
-                        
-                        // if org exast against its org id
-                        if !(snapshot.value is NSNull) {
-                            tempOrgsList[self.owner!.keys.array[x]] = snapshot.value as? [NSObject : AnyObject]
-                            
-                            countReturn++
-                            // when all orgs return then callback
-                            if countReturn == self.owner!.keys.array.count {
-                                callBack(orgList: tempOrgsList)
-                                countReturn = 0
-                                return
-                            }
-                            
-                        }
-                            // if org is not exast against its org id
-                        else{
-                            countReturn++
-                            // when all orgs return then callback
-                            if countReturn == self.owner!.keys.array.count {
-                                callBack(orgList: tempOrgsList)
-                                countReturn = 0
-                                return
-                            }
-                        }
-                    })
+                        callBack(activities: tempActivities)
                     
-                }
-                
-            })
-            
+                })
+            }
+        }
     }
-
+ 
+    
+ 
 }
 
 class Team {
@@ -855,6 +771,28 @@ class WowRef {
         
     }
     
+    
+     func asyncSpaceDesc(spaceIDs: [String],  callBack: (spaceDesc: [String : AnyObject]) -> Void ){
+        
+        var localSpacesDesc = [String : AnyObject]()
+        var count = 0
+        
+        for spaceID in spaceIDs {
+            let tempRef = WowRef.ref.childByAppendingPath("space-meta-data/\(spaceID)")
+            
+            tempRef.observeEventType(FEventType.Value, withBlock: { (snapshot) -> Void in
+                
+                localSpacesDesc[snapshot.key] = snapshot.value
+                
+                count++
+                // when all org desc data arived
+                if count == spaceIDs.count {
+                    callBack(spaceDesc: localSpacesDesc)
+                }
+            })
+        }
+    }
+    
 }
 
 
@@ -964,28 +902,14 @@ class AsyncArray {
             }
         })
     }
-}
-
-
-func asyncSpaceDesc(spaceIDs: [String],  callBack: (spaceDesc: [String : AnyObject]) -> Void ){
     
-    var localSpacesDesc = [String : AnyObject]()
-    var count = 0
     
-    for spaceID in spaceIDs {
-        let tempRef = Firebase(url: "https://panacloud1.firebaseio.com/orgs/\(spaceID)")
-        
-        tempRef.observeEventType(FEventType.Value, withBlock: { (snapshot) -> Void in
-            
-            localSpacesDesc[snapshot.key] = snapshot.value
-            
-            count++
-            // when all org desc data arived
-            if count == spaceIDs.count {
-                callBack(spaceDesc: localSpacesDesc)
-            }
-        })
-    }
-}
+    
 
+    
+    
+
+    
+    
+}
 

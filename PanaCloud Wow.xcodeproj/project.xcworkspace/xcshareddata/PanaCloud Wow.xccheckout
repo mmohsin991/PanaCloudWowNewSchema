@@ -10,6 +10,8 @@
 	<string>PanaCloud Wow</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
+		<key>000306B22408EE8E2476D6135DD47D598D237983</key>
+		<string>https://github.com/mmohsin991/PanaCloudWowNewSchema.git</string>
 		<key>179F887914467ABBA7582A0D74E8FD4A972FAE83</key>
 		<string>https://github.com/mmohsin991/PanaCloud-Wow.git</string>
 	</dict>
@@ -17,15 +19,17 @@
 	<string>PanaCloud Wow.xcodeproj</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
-		<key>179F887914467ABBA7582A0D74E8FD4A972FAE83</key>
+		<key>000306B22408EE8E2476D6135DD47D598D237983</key>
 		<string>../..</string>
+		<key>179F887914467ABBA7582A0D74E8FD4A972FAE83</key>
+		<string>../../../PanaCloud%20Wow</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
-	<string>https://github.com/mmohsin991/PanaCloud-Wow.git</string>
+	<string>https://github.com/mmohsin991/PanaCloudWowNewSchema.git</string>
 	<key>IDESourceControlProjectVersion</key>
 	<integer>111</integer>
 	<key>IDESourceControlProjectWCCIdentifier</key>
-	<string>179F887914467ABBA7582A0D74E8FD4A972FAE83</string>
+	<string>000306B22408EE8E2476D6135DD47D598D237983</string>
 	<key>IDESourceControlProjectWCConfigurations</key>
 	<array>
 		<dict>
@@ -35,6 +39,14 @@
 			<string>179F887914467ABBA7582A0D74E8FD4A972FAE83</string>
 			<key>IDESourceControlWCCName</key>
 			<string>PanaCloud%20Wow</string>
+		</dict>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>000306B22408EE8E2476D6135DD47D598D237983</string>
+			<key>IDESourceControlWCCName</key>
+			<string>PanaCloudWowNewSchema</string>
 		</dict>
 	</array>
 </dict>

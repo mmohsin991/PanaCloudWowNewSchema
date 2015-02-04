@@ -34,12 +34,9 @@ class HomeVC: WowUIViewController, UITableViewDataSource, UITableViewDelegate, U
     @IBOutlet weak var tabBar: UITabBar!
     
     var ownersList = [String: AnyObject]()
-    var subscriberList = [String: [NSObject : AnyObject] ]()
-    
 
     var tableType = "SPACES"
 
-    var tempSpaceIDs = [ "shezispace1" , "space1"]
     var tempNotification = [String: AnyObject]()
 
     
@@ -48,43 +45,43 @@ class HomeVC: WowUIViewController, UITableViewDataSource, UITableViewDelegate, U
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        ownersList.keys.array
         self.scrollView.contentSize = self.containerView.frame.size
 
         if loginUser == nil {
             loginUser = User(ref: "", uID: "zia", email: "ziaukhan@hotmail.com", firstName: "Zia", lastName: "Khan", status: "verified")
         }
         
-        let refPanacloudActivities = Firebase(url: "https://panacloud1.firebaseio.com/space-activity-streams/panacloud")
-//        let notification = AsyncArray(ref: refPanacloudActivities) { (dataArray) -> Void in
-//            println(dataArray.count)
-//            println(dataArray)
-//        }
-    
         
-        let notifications = AsyncObject(ref: refPanacloudActivities) { (data, updateKey) -> Void in
+        loginUser?.asyncGetMemberList({ (members) -> Void in
             
-            if data != nil {
-                self.tempNotification = data!
-                println(updateKey)
+            if members != nil {
+                // when spaces list is loaded then acquirng for desc for spaces
+                wowref.asyncSpaceDesc(members!.keys.array, { (spacesDesc) -> Void in
+                    self.ownersList = spacesDesc
+                    
+                    println(spacesDesc)
+                    
+                    self.orgTableView.reloadData()
+                    
+                    // stop and hide the loading indicators
+                    self.loadingInd.stopAnimating()
+                    self.loadingLbl.hidden = true
                 
-                self.orgTableView.reloadData()
-                
-                // stop and hide the loading indicators
-                self.loadingInd.stopAnimating()
-                self.loadingLbl.hidden = true
+                })
+                // when spaces list is loaded then acquirng for desc for spaces
+                loginUser?.asyncGetActivityStream({ (activities) -> Void in
+                    
+                    self.tempNotification = activities!
+                    self.orgTableView.reloadData()
+
+                })
             }
             
-        }
-        
-        //
-        asyncSpaceDesc(tempSpaceIDs, { (spacesDesc) -> Void in
-            self.ownersList = spacesDesc
-            
-            println(spacesDesc)
-            
-            self.orgTableView.reloadData()
         })
+        
+
+
         
         
         // table view configurations
@@ -177,7 +174,7 @@ class HomeVC: WowUIViewController, UITableViewDataSource, UITableViewDelegate, U
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
         if self.tableType == "SPACES" {
-            return self.ownersList.keys.array.count + self.subscriberList.keys.array.count
+            return self.ownersList.keys.array.count
         }
         else if self.tableType == "NOTIFICATIONS" {
             return self.tempNotification.keys.array.count
@@ -197,20 +194,12 @@ class HomeVC: WowUIViewController, UITableViewDataSource, UITableViewDelegate, U
 
         // if orgs TableView comes
         if self.tableType == "SPACES" {
-            if indexPath.row < self.ownersList.keys.array.count {
                 if self.ownersList.values.array[indexPath.row]["title"] != nil {
                     cell.textLabel?.text = self.ownersList.values.array[indexPath.row]["title"] as NSString
                 }
                 if self.ownersList.values.array[indexPath.row]["desc"] != nil {
                     cell.detailTextLabel?.text = self.ownersList.values.array[indexPath.row]["desc"] as NSString
                 }
-            }
-            else {
-                let tempIndexRow = indexPath.row - self.ownersList.keys.array.count
-                
-                cell.textLabel?.text = self.subscriberList.values.array[tempIndexRow]["title"] as NSString
-                cell.detailTextLabel?.text = self.subscriberList.values.array[tempIndexRow]["desc"] as NSString
-            }
             
              cell.imageView?.image = UIImage(named: "org")
             
