@@ -25,9 +25,11 @@
 		421CDDA51A7CF82C00C58C02 /* HomeVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 421CDDA41A7CF82C00C58C02 /* HomeVC.swift */; };
 		421CDDA71A7CF8B800C58C02 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 421CDDA61A7CF8B800C58C02 /* Constants.swift */; };
 		421CDDAA1A7CF8EC00C58C02 /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 421CDDA91A7CF8EC00C58C02 /* Model.swift */; };
-		421CDDAC1A7CFA5300C58C02 /* AddOrgVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 421CDDAB1A7CFA5300C58C02 /* AddOrgVC.swift */; };
+		421CDDAC1A7CFA5300C58C02 /* AddSpaceVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 421CDDAB1A7CFA5300C58C02 /* AddSpaceVC.swift */; };
 		421CDDAE1A7CFAD100C58C02 /* PreferencesVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 421CDDAD1A7CFAD100C58C02 /* PreferencesVC.swift */; };
 		424660781A7FBC72000661CA /* UserVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 424660771A7FBC72000661CA /* UserVC.swift */; };
+		42E72C3D1A835AB8005CDD7D /* LoginVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42E72C3B1A835AB8005CDD7D /* LoginVC.swift */; };
+		42E72C3E1A835AB8005CDD7D /* SignupVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42E72C3C1A835AB8005CDD7D /* SignupVC.swift */; };
 		42E818F21A7D343400A850C4 /* userCheckIn.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42E818F11A7D343400A850C4 /* userCheckIn.swift */; };
 /* End PBXBuildFile section */
 
@@ -65,9 +67,11 @@
 		421CDDA41A7CF82C00C58C02 /* HomeVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeVC.swift; sourceTree = "<group>"; };
 		421CDDA61A7CF8B800C58C02 /* Constants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		421CDDA91A7CF8EC00C58C02 /* Model.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Model.swift; sourceTree = "<group>"; };
-		421CDDAB1A7CFA5300C58C02 /* AddOrgVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddOrgVC.swift; sourceTree = "<group>"; };
+		421CDDAB1A7CFA5300C58C02 /* AddSpaceVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddSpaceVC.swift; sourceTree = "<group>"; };
 		421CDDAD1A7CFAD100C58C02 /* PreferencesVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PreferencesVC.swift; sourceTree = "<group>"; };
 		424660771A7FBC72000661CA /* UserVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserVC.swift; sourceTree = "<group>"; };
+		42E72C3B1A835AB8005CDD7D /* LoginVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginVC.swift; sourceTree = "<group>"; };
+		42E72C3C1A835AB8005CDD7D /* SignupVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SignupVC.swift; sourceTree = "<group>"; };
 		42E818F11A7D343400A850C4 /* userCheckIn.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = userCheckIn.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -118,8 +122,10 @@
 			isa = PBXGroup;
 			children = (
 				421CDD6B1A7CE34100C58C02 /* AppDelegate.swift */,
+				42E72C3B1A835AB8005CDD7D /* LoginVC.swift */,
+				42E72C3C1A835AB8005CDD7D /* SignupVC.swift */,
 				421CDDA41A7CF82C00C58C02 /* HomeVC.swift */,
-				421CDDAB1A7CFA5300C58C02 /* AddOrgVC.swift */,
+				421CDDAB1A7CFA5300C58C02 /* AddSpaceVC.swift */,
 				421CDDAD1A7CFAD100C58C02 /* PreferencesVC.swift */,
 				424660771A7FBC72000661CA /* UserVC.swift */,
 				42E818F11A7D343400A850C4 /* userCheckIn.swift */,
@@ -288,11 +294,13 @@
 			files = (
 				42E818F21A7D343400A850C4 /* userCheckIn.swift in Sources */,
 				421CDDAE1A7CFAD100C58C02 /* PreferencesVC.swift in Sources */,
+				42E72C3D1A835AB8005CDD7D /* LoginVC.swift in Sources */,
 				424660781A7FBC72000661CA /* UserVC.swift in Sources */,
 				421CDDAA1A7CF8EC00C58C02 /* Model.swift in Sources */,
 				421CDDA31A7CF81600C58C02 /* SidePanelViewController.swift in Sources */,
+				42E72C3E1A835AB8005CDD7D /* SignupVC.swift in Sources */,
 				421CDDA51A7CF82C00C58C02 /* HomeVC.swift in Sources */,
-				421CDDAC1A7CFA5300C58C02 /* AddOrgVC.swift in Sources */,
+				421CDDAC1A7CFA5300C58C02 /* AddSpaceVC.swift in Sources */,
 				421CDD6C1A7CE34100C58C02 /* AppDelegate.swift in Sources */,
 				421CDDA21A7CF81600C58C02 /* ContainerViewController.swift in Sources */,
 				421CDD6F1A7CE34100C58C02 /* PanaCloud_Wow.xcdatamodeld in Sources */,

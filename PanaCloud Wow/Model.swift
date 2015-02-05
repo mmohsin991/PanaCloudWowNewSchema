@@ -348,17 +348,17 @@ class Team {
     }
 }
 
-class Org {
+class Space {
     var ref: String
-    var orgID: String
+    var spaceID: String
     var desc: String
     var title: String
     var owner: String // user uID
-    var members: [String : [String: AnyObject]]? // user uID, and member 
+    var members: [String : AnyObject]? // user uID, and member 
     
     
-    init(ref: String, orgID: String, desc: String, title: String, owner: String ){
-        self.orgID = orgID
+    init(ref: String, spaceID: String, desc: String, title: String, owner: String ){
+        self.spaceID = spaceID
         self.desc = desc
         self.title = title
         self.ref = ref
@@ -366,13 +366,195 @@ class Org {
         
     }
     
-    convenience init(ref: String, orgID: String, desc: String, title: String, owner: String, members: [String : [String: AnyObject]]){
-        self.init(ref: ref, orgID: orgID, desc: desc, title: title, owner: owner)
+    convenience init(ref: String, spaceID: String, desc: String, title: String, owner: String, members: [String :  AnyObject]){
+        self.init(ref: ref, spaceID: spaceID, desc: desc, title: title, owner: owner)
         
         self.members = members
+
+        
+        
         
     }
 }
+
+class SpaceMetaData {
+    var spaceID: String
+    var desc: String
+    var title: String
+    var cover_image = spaceCoverImg
+    var logo_image = spaceLogoImg
+    var members_count = 1
+    var teams_count = 0
+    var subteams_count = 0
+    var members_checked_in = [String : AnyObject]()
+    var emailDomainRestriction: String?
+
+    var members = [String : AnyObject]() // user uID, and member
+    
+    init(spaceID: String, desc: String, title: String, owner: String , members: [String]?, emailDomainRestriction : String?){
+        self.spaceID = spaceID
+        self.desc = desc
+        self.title = title
+        
+        // if no member is provided at the time of initialinzation
+        if members == nil {
+            self.members[owner] = ["membership-type" : "1","timestamp" : kFirebaseServerValueTimestamp]
+        }
+        // if members is provided at the time of initialinzation
+        else if members != nil{
+            
+            // convert array to dictionary
+            for member in members!{
+                self.members[member] = ["membership-type" : "3","timestamp" : kFirebaseServerValueTimestamp]
+                self.members_count++
+
+            }
+        
+            self.members[owner] = ["membership-type" : "1","timestamp" : kFirebaseServerValueTimestamp]
+
+        }
+        if emailDomainRestriction != nil {
+            self.emailDomainRestriction = emailDomainRestriction
+        }
+        
+
+        
+    }
+    
+    func upload(callBack :(errorDesc: String?) -> Void){
+         wowref.asyncSpaceIsExist(self.spaceID, callBack: { (isExist) -> Void in
+            
+            if isExist{
+                callBack(errorDesc: "Space ID already exist please use another ID")
+            }
+            else{
+                
+                // upload to space metadata
+                let tempRef = WowRef.ref.childByAppendingPath("space-meta-data/\(self.spaceID)")
+                var data = [String: AnyObject]()
+                
+                data["title"] = self.title
+                data["desc"] = self.desc
+                data["members-count"] = self.members_count
+                data["teams-count"] = self.teams_count
+                data["subteams-count"] = self.subteams_count
+                
+                tempRef.updateChildValues(data)
+                
+                // upload to space
+                let tempRef1 = WowRef.ref.childByAppendingPath("spaces/\(self.spaceID)")
+                
+                var data1 = [String: AnyObject]()
+                data1["title"] = self.title
+                data1["desc"] = self.desc
+                data1["timestamp"] = kFirebaseServerValueTimestamp
+                if self.emailDomainRestriction != nil {
+                    data1["email-domain-restriction"] = self.emailDomainRestriction
+                }
+                
+                tempRef1.updateChildValues(data1)
+                
+                for (key,value) in self.members {
+                    let memType = value["membership-type"] as NSString
+                    wowref.setSpaceMembers(self.spaceID, userID: key, membership_type: memType)
+                    wowref.setUserMemberships(key, spaceID: self.spaceID, membership_type: memType)
+                }
+                
+                callBack(errorDesc: nil)
+            }
+         
+         })
+        
+    }
+    
+    init(spaceID: String, callBack: (space : SpaceMetaData) -> Void){
+        
+        // temp initialization
+        self.spaceID = spaceID
+        self.desc = ""
+        self.title = ""
+
+        // when spaces list is loaded then acquirng for desc for spaces
+        let tempRef = WowRef.ref.childByAppendingPath("space-meta-data/\(spaceID)")
+        
+        tempRef.observeSingleEventOfType(FEventType.Value, withBlock: { (snapshot) -> Void in
+            
+            
+            if snapshot.value["title"] != nil {
+                self.title = snapshot.value["title"] as NSString
+            }
+            if snapshot.value["desc"] != nil {
+                self.desc = snapshot.value["desc"] as NSString
+            }
+            if snapshot.value["members-count"] != nil {
+                self.members_count = snapshot.value["members-count"] as NSNumber
+            }
+            if snapshot.value["teams-count"] != nil {
+                self.teams_count = snapshot.value["teams-count"] as NSNumber
+            }
+            if snapshot.value["subteams-count"] != nil {
+                self.subteams_count = snapshot.value["subteams-count"] as NSNumber
+            }
+            if snapshot.value["members-checked-in"] != nil {
+                self.members_checked_in = snapshot.value["members-checked-in"] as [String : AnyObject]
+            }
+            
+            
+            
+            callBack(space: self)
+
+            
+        })
+        
+    }
+    
+    
+    
+    
+    func observer(callBack: (space : SpaceMetaData) -> Void ){
+        
+        if self.spaceID != "" {
+            
+            let tempRef = WowRef.ref.childByAppendingPath("space-meta-data/\(self.spaceID)")
+            tempRef.observeEventType(FEventType.Value, withBlock: { (snapshot) -> Void in
+                
+                if snapshot.value["title"] != nil {
+                    self.title = snapshot.value["title"] as NSString
+                }
+                if snapshot.value["desc"] != nil {
+                    self.desc = snapshot.value["desc"] as NSString
+                }
+                if snapshot.value["members-count"] != nil {
+                    self.members_count = snapshot.value["members-count"] as NSNumber
+                }
+                if snapshot.value["teams-count"] != nil {
+                    self.teams_count = snapshot.value["teams-count"] as NSNumber
+                }
+                if snapshot.value["subteams-count"] != nil {
+                    self.subteams_count = snapshot.value["subteams-count"] as NSNumber
+                }
+                if snapshot.value["members-checked-in"] != nil {
+                    self.members_checked_in = snapshot.value["members-checked-in"] as [String : AnyObject]
+                }
+                
+                callBack(space: self)
+
+                
+            })
+        }
+    }
+    
+    
+    
+//    convenience init(ref: String, spaceID: String, desc: String, title: String, owner: String, members: [String :  AnyObject]){
+//        self.init(spaceID: spaceID, desc: desc, title: title, owner: owner)
+//        
+//        self.members = members
+//        
+//    }
+}
+
+
 
 class WowRef {
     
@@ -545,9 +727,9 @@ class WowRef {
         })
     }
     
-    func asyncOrgIsExist(orgID: String, callBack: (isExist : Bool) -> Void ){
+    func asyncSpaceIsExist(spaceID: String, callBack: (isExist : Bool) -> Void ){
         
-        WowRef.ref.childByAppendingPath("orgs/\(orgID)").observeSingleEventOfType(FEventType.Value, withBlock: { snapshot in
+        WowRef.ref.childByAppendingPath("space-meta-data/\(spaceID)").observeSingleEventOfType(FEventType.Value, withBlock: { snapshot in
             if snapshot.value["desc"] != nil {
                 callBack(isExist: true)
             }
@@ -562,7 +744,7 @@ class WowRef {
     func asynUserIsExist(uID: String, callBack: (isExist : Bool) -> Void ){
         
         WowRef.ref.childByAppendingPath("users/\(uID)").observeSingleEventOfType(FEventType.Value, withBlock: { snapshot in
-            if snapshot.value["email"] != nil {
+            if !(snapshot.value is NSNull) {
                 callBack(isExist: true)
             }
             else{
@@ -571,93 +753,7 @@ class WowRef {
             
         })
     }
-    
-    func asyncCreateOrganization(org: Team, callBack: (errorDesc : String?, unRegMembersUIDs: [String]?) -> Void ){
-        
-        var storeUnRegMembersUIDs: [String]!
-        
-        var tempsnap = FDataSnapshot()
-        
-        asyncOrgIsExist(org.orgID, callBack: { (isExist) -> Void in
-            // 1 - check if already exist
-            if isExist {
-               callBack(errorDesc: "org is already exist, plz try with diff orginization ID", unRegMembersUIDs: nil)
-            }
-            
-            else{
-                // 2 - add org to the user org's list
-                if org.members?.keys.array != nil {
-                    let members = org.members!.keys.array
-                    
-                    var countCallbackIteration = 0
-                    // retrive eache member of the org
-                    for x in 0..<members.count{
-                        WowRef.ref.childByAppendingPath("users/\(members[x])").observeSingleEventOfType(FEventType.Value, withBlock: { snapshot in
-                            // user exist
-                            if snapshot.value["email"] != nil {
-                                let memberType = org.members![members[x]]
-                                let addMember : [String : [String : Int]] = ["member": [ org.orgID : memberType!] ]
-                                snapshot.ref.updateChildValues(addMember)
-                                
-                                countCallbackIteration++
-                            }
-                            // user not exist
-                            else{
-                                if storeUnRegMembersUIDs == nil {
-                                  storeUnRegMembersUIDs = [String]()
-                                }
-                                storeUnRegMembersUIDs.append(members[x])
-                                println(members[x])
-                                countCallbackIteration++
-                            }
-                            
-                            // callback when all members are check whether they exist or not
-                            if countCallbackIteration == members.count{
-                                // MARK: retun callBack Func
-                                callBack(errorDesc: nil, unRegMembersUIDs: storeUnRegMembersUIDs)
-
-                            }
-                        })
-                    }
-                    
-                }
-                
-                
-                // 3 - add org to user application org list
-                
-                if let orgMembers = org.members {
-                    
-                    let insertedData = [org.orgID : [
-                        "desc" : org.desc,
-                        "owner" : org.owner,
-                        "title" : org.title,
-                        // 4 - add members in orgs member list
-                        "members" : orgMembers
-                    ]]
-                    WowRef.ref.childByAppendingPath("orgs").updateChildValues(insertedData)
-                }
-                else{
-                    let insertedData = [org.orgID : [
-                        "desc" : org.desc,
-                        "owner" : org.owner,
-                        "title" : org.title,
-                        // 4 - no members in orgs member list
-
-                    ]]
-                    WowRef.ref.childByAppendingPath("orgs").updateChildValues(insertedData)
-                }
-            }
-            
-            // 5 - add org in members's owner list
-            let orgDetail = [org.orgID : [
-            "desc" : org.desc,
-            "title" : org.title
-                ]
-            ]
-            WowRef.ref.childByAppendingPath("users/\(org.owner)/owner").updateChildValues(orgDetail)
-        })
-        
-    }
+  
     
     func asyncSignUpUser(user: User, password: String, callBack : (error: String?) -> Void){
         
@@ -771,7 +867,7 @@ class WowRef {
         
     }
     
-    
+    // provide space metadata against spaceid
      func asyncSpaceDesc(spaceIDs: [String],  callBack: (spaceDesc: [String : AnyObject]) -> Void ){
         
         var localSpacesDesc = [String : AnyObject]()
@@ -783,20 +879,32 @@ class WowRef {
             tempRef.observeEventType(FEventType.Value, withBlock: { (snapshot) -> Void in
                 
                 localSpacesDesc[snapshot.key] = snapshot.value
-                
+                println(snapshot.value)
                 count++
                 // when all org desc data arived
-                if count == spaceIDs.count {
+                if count >= spaceIDs.count {
                     callBack(spaceDesc: localSpacesDesc)
                 }
             })
         }
     }
     
+    
+    func setUserMemberships(userID: String, spaceID: String, membership_type: String){
+        let tempRef = WowRef.ref.childByAppendingPath("user-memberships/\(userID)")
+
+        tempRef.updateChildValues([spaceID:["membership-type": membership_type,"timestamp" : kFirebaseServerValueTimestamp]])
+    }
+    
+    func setSpaceMembers(spaceID: String, userID: String, membership_type: String){
+        let tempRef = WowRef.ref.childByAppendingPath("space-members/\(spaceID)")
+        
+        tempRef.updateChildValues([userID:["membership-type": membership_type,"timestamp" : kFirebaseServerValueTimestamp]])
+    }
+    
+    
 }
 
-
-// MARK: New Model
 
 class AsyncObject{
     

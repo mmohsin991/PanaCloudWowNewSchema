@@ -9,22 +9,6 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "PanaCloud Wow/HomeVC.swift"
-            timestampString = "444776807.312958"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "196"
-            endingLineNumber = "196"
-            landmarkName = "tableView(_:cellForRowAtIndexPath:)"
-            landmarkType = "5">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
             filePath = "PanaCloud Wow/Model.swift"
             timestampString = "444776606.860066"
             startingColumnNumber = "9223372036854775807"
@@ -48,6 +32,54 @@
             startingLineNumber = "314"
             endingLineNumber = "314"
             landmarkName = "asyncGetActivityStream(_:)"
+            landmarkType = "5">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "PanaCloud Wow/Model.swift"
+            timestampString = "444855007.707492"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "398"
+            endingLineNumber = "398"
+            landmarkName = "init(spaceID:desc:title:owner:members:emailDomainRestriction:)"
+            landmarkType = "5">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "PanaCloud Wow/Model.swift"
+            timestampString = "444856591.215938"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "882"
+            endingLineNumber = "882"
+            landmarkName = "asyncSpaceDesc(_:callBack:)"
+            landmarkType = "5">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "PanaCloud Wow/Model.swift"
+            timestampString = "444856460.084764"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "530"
+            endingLineNumber = "530"
+            landmarkName = "observer(_:)"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>

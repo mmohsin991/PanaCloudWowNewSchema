@@ -34,6 +34,7 @@ class HomeVC: WowUIViewController, UITableViewDataSource, UITableViewDelegate, U
     @IBOutlet weak var tabBar: UITabBar!
     
     var ownersList = [String: AnyObject]()
+    var spaceMetaData = [SpaceMetaData]()
 
     var tableType = "SPACES"
 
@@ -52,23 +53,49 @@ class HomeVC: WowUIViewController, UITableViewDataSource, UITableViewDelegate, U
             loginUser = User(ref: "", uID: "zia", email: "ziaukhan@hotmail.com", firstName: "Zia", lastName: "Khan", status: "verified")
         }
         
+        println("muhammad.mohsin.991@gmail.com".md5)
+        
+        
         
         loginUser?.asyncGetMemberList({ (members) -> Void in
             
             if members != nil {
                 // when spaces list is loaded then acquirng for desc for spaces
-                wowref.asyncSpaceDesc(members!.keys.array, { (spacesDesc) -> Void in
-                    self.ownersList = spacesDesc
-                    
-                    println(spacesDesc)
-                    
-                    self.orgTableView.reloadData()
-                    
-                    // stop and hide the loading indicators
-                    self.loadingInd.stopAnimating()
-                    self.loadingLbl.hidden = true
+//                wowref.asyncSpaceDesc(members!.keys.array, { (spacesDesc) -> Void in
+//                    self.ownersList = spacesDesc
+//                    
+//                  //  println(spacesDesc)
+//                    
+//                    self.orgTableView.reloadData()
+//                    
+//                    // stop and hide the loading indicators
+//                    self.loadingInd.stopAnimating()
+//                    self.loadingLbl.hidden = true
+//                
+//                })
                 
-                })
+                var count = 0
+                for member in members!.keys.array {
+                    
+                    let space = SpaceMetaData(spaceID: member, callBack: { (space) -> Void in
+                        self.spaceMetaData.append(space)
+                        count++
+                        
+                        if count == members!.keys.array.count{
+                            // stop and hide the loading indicators
+                            
+                            self.loadingInd.stopAnimating()
+                            self.loadingLbl.hidden = true
+                            
+
+                        }
+                    })
+                    space.observer({ (space) -> Void in
+                        self.orgTableView.reloadData()
+
+                    })
+                }
+
                 // when spaces list is loaded then acquirng for desc for spaces
                 loginUser?.asyncGetActivityStream({ (activities) -> Void in
                     
@@ -174,7 +201,8 @@ class HomeVC: WowUIViewController, UITableViewDataSource, UITableViewDelegate, U
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
         if self.tableType == "SPACES" {
-            return self.ownersList.keys.array.count
+//            return self.ownersList.keys.array.count
+            return self.spaceMetaData.count
         }
         else if self.tableType == "NOTIFICATIONS" {
             return self.tempNotification.keys.array.count
@@ -189,49 +217,74 @@ class HomeVC: WowUIViewController, UITableViewDataSource, UITableViewDelegate, U
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell{
-        
-        let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as UITableViewCell
 
         // if orgs TableView comes
         if self.tableType == "SPACES" {
-                if self.ownersList.values.array[indexPath.row]["title"] != nil {
-                    cell.textLabel?.text = self.ownersList.values.array[indexPath.row]["title"] as NSString
-                }
-                if self.ownersList.values.array[indexPath.row]["desc"] != nil {
-                    cell.detailTextLabel?.text = self.ownersList.values.array[indexPath.row]["desc"] as NSString
-                }
             
-             cell.imageView?.image = UIImage(named: "org")
+            let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as SpaceTableViewCell
+            
+            
+            //                if self.ownersList.values.array[indexPath.row]["title"] != nil {
+            //                    cell.textLabel?.text = self.ownersList.values.array[indexPath.row]["title"] as NSString
+            //                }
+            //                if self.ownersList.values.array[indexPath.row]["desc"] != nil {
+            //                    cell.detailTextLabel?.text = self.ownersList.values.array[indexPath.row]["desc"] as NSString
+            //                }
+            
+            
+            cell.title?.text = self.spaceMetaData[indexPath.row].title
+            cell.desc?.text = self.spaceMetaData[indexPath.row].desc
+            cell.members_count?.text = self.spaceMetaData[indexPath.row].members_count.description
+            cell.checkInCount?.text = (self.spaceMetaData[indexPath.row].members_checked_in["count"] as NSNumber).description
+            
+            println(self.spaceMetaData[indexPath.row].members_checked_in["count"])
+            cell.teams_count?.text = self.spaceMetaData[indexPath.row].teams_count.description
+            cell.subteams_count?.text = self.spaceMetaData[indexPath.row].subteams_count.description
+            
+            cell.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(0.0)
+            cell.separatorInset = UIEdgeInsets(top: 0.0, left: 15.0, bottom: 0.0, right: 15.0)
+            cell.textLabel?.textColor = colorLBlue
+            
+            
+            // for image to round shape
+            //        cell.imageView?.layer.cornerRadius = 25
+            //        cell.imageView?.layer.masksToBounds = true
+            
+            
+            return cell
             
         }
         
         // if notification TableView comes
         else if self.tableType == "NOTIFICATIONS"{
+            let cell = UITableViewCell(style: UITableViewCellStyle.Subtitle , reuseIdentifier: "cell")
+
             
                 cell.textLabel?.text = self.tempNotification.values.array[indexPath.row]["verb"] as NSString
                 cell.detailTextLabel?.text = self.tempNotification.values.array[indexPath.row]["displayName"] as NSString
             
             
-            cell.imageView?.image = UIImage(named: "notification")
-
+            cell.imageView?.image = imgNotification
             
+            cell.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(0.0)
+            cell.separatorInset = UIEdgeInsets(top: 0.0, left: 15.0, bottom: 0.0, right: 15.0)
+            cell.textLabel?.textColor = colorLBlue
+            
+            
+            // for image to round shape
+            //        cell.imageView?.layer.cornerRadius = 25
+            //        cell.imageView?.layer.masksToBounds = true
+            
+            
+            return cell
         }
-            
-        cell.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(0.0)
-        cell.separatorInset = UIEdgeInsets(top: 0.0, left: 15.0, bottom: 0.0, right: 15.0)
-        cell.textLabel?.textColor = colorLBlue
-
         
-        // for image to round shape
-//        cell.imageView?.layer.cornerRadius = 25
-//        cell.imageView?.layer.masksToBounds = true
-        
+        return UITableViewCell()
 
-        return cell
     }
     
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
-        return 50.0
+        return 70.0
     }
     
     
@@ -344,7 +397,7 @@ class HomeVC: WowUIViewController, UITableViewDataSource, UITableViewDelegate, U
         //        UIView.animateWithDuration(1, delay: 0, usingSpringWithDamping: 0.3, initialSpringVelocity: 0, options: nil, animations: { () -> Void in
         //            containerView.layer.transform = CGAffineTransformMakeRotation(M_PI)
         //        }) { (Bool) -> Void in
-        //            <#code#>
+        //            
         //        }
 
     }
@@ -353,4 +406,23 @@ class HomeVC: WowUIViewController, UITableViewDataSource, UITableViewDelegate, U
         
         performSegueWithIdentifier("userSeg", sender: self)
     }
+}
+
+
+
+class SpaceTableViewCell: UITableViewCell {
+    
+    
+    @IBOutlet weak var desc: UILabel!
+    @IBOutlet weak var title: UILabel!
+    @IBOutlet weak var members_count: UILabel!
+    @IBOutlet weak var checkInCount: UILabel!
+    @IBOutlet weak var teams_count: UILabel!
+    @IBOutlet weak var subteams_count: UILabel!
+    
+    
+    @IBOutlet weak var spaceImage: UIImageView!
+
+
+    
 }

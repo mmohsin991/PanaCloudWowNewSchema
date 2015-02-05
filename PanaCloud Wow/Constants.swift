@@ -14,6 +14,27 @@ import UIKit
 
 var wowref = WowRef()
 
+
+// firebase time
+let kFirebaseServerValueTimestamp = [".sv":"timestamp"]
+
+func fTimeStampToNSDate(timeIndervalInMSec : Double?) -> NSDate {
+    
+    if timeIndervalInMSec != nil {
+        let timeInSeconds = timeIndervalInMSec! / 1000.0
+        
+        return NSDate(timeIntervalSince1970:timeInSeconds)
+    }
+    else {
+        return  NSDate()
+    }
+}
+
+let spaceLogoImg = UIImage(named: "org")
+let spaceCoverImg = UIImage(named: "org")
+let imgNotification = UIImage(named: "notification")
+
+
 var loginUser : User?
 
 var backgroundImage : UIImage = UIImage(named: "Background1") {
@@ -39,3 +60,24 @@ class WowUIViewController: UIViewController {
     var delegate: CenterViewControllerDelegate?
 
 }
+
+extension String  {
+    var md5: String! {
+        let str = self.cStringUsingEncoding(NSUTF8StringEncoding)
+            let strLen = CC_LONG(self.lengthOfBytesUsingEncoding(NSUTF8StringEncoding))
+            let digestLen = Int(CC_MD5_DIGEST_LENGTH)
+            let result = UnsafeMutablePointer<CUnsignedChar>.alloc(digestLen)
+            
+            CC_MD5(str!, strLen, result)
+            
+            var hash = NSMutableString()
+            for i in 0..<digestLen {
+                hash.appendFormat("%02x", result[i])
+            }
+            
+            result.dealloc(digestLen)
+            
+            return String(format: hash)
+    }
+}
+
