@@ -308,10 +308,18 @@ class User{
         
         if self.spaces != nil {
             for space in self.spaces!.keys.array {
+                // for add activity
                 WowRef.ref.childByAppendingPath("space-activity-streams/\(space)").observeEventType(FEventType.ChildAdded, withBlock: { (snapshot) -> Void in
                    tempActivities[snapshot.key] = snapshot.value
 
                         callBack(activities: tempActivities)
+                    
+                })
+                // for delete acctivity
+                WowRef.ref.childByAppendingPath("space-activity-streams/\(space)").observeEventType(FEventType.ChildRemoved, withBlock: { (snapshot) -> Void in
+                    tempActivities.removeValueForKey(snapshot.key)
+                    
+                    callBack(activities: tempActivities)
                     
                 })
             }

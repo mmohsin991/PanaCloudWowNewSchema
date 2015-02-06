@@ -55,7 +55,7 @@ class HomeVC: WowUIViewController, UITableViewDataSource, UITableViewDelegate, U
         
         println("muhammad.mohsin.991@gmail.com".md5)
         
-        
+        //wowref.updateActiviy("pacacloud", verb: "i do", displayName: "i am doing some thing", actor: ["type" : "user"], object: ["type" : "user"], target: ["type" : "space"])
         
         loginUser?.asyncGetMemberList({ (members) -> Void in
             
