@@ -236,8 +236,6 @@ class HomeVC: WowUIViewController, UITableViewDataSource, UITableViewDelegate, U
             cell.desc?.text = self.spaceMetaData[indexPath.row].desc
             cell.members_count?.text = self.spaceMetaData[indexPath.row].members_count.description
             cell.checkInCount?.text = (self.spaceMetaData[indexPath.row].members_checked_in["count"] as NSNumber).description
-            
-            println(self.spaceMetaData[indexPath.row].members_checked_in["count"])
             cell.teams_count?.text = self.spaceMetaData[indexPath.row].teams_count.description
             cell.subteams_count?.text = self.spaceMetaData[indexPath.row].subteams_count.description
             
@@ -257,14 +255,26 @@ class HomeVC: WowUIViewController, UITableViewDataSource, UITableViewDelegate, U
         
         // if notification TableView comes
         else if self.tableType == "NOTIFICATIONS"{
-            let cell = UITableViewCell(style: UITableViewCellStyle.Subtitle , reuseIdentifier: "cell")
+           // let cell = UITableViewCell(style: UITableViewCellStyle.Subtitle , reuseIdentifier: "cell")
+            let cell = tableView.dequeueReusableCellWithIdentifier("Cell1", forIndexPath: indexPath) as NotificatioTableViewCell
 
+            if self.tempNotification.values.array[indexPath.row]["verb"] != nil {
+                cell.title.text = self.tempNotification.values.array[indexPath.row]["verb"] as NSString
+
+            }
+            if self.tempNotification.values.array[indexPath.row]["displayName"] != nil {
+                cell.desc.text = self.tempNotification.values.array[indexPath.row]["displayName"] as NSString
+            }
+            if let date: AnyObject? = self.tempNotification.values.array[indexPath.row]["published"]{
+                
+                let dataAndTime = (date as NSNumber)
+                cell.data.text =  fTimeStampToNSDate(dataAndTime).description
+
+            }
             
-                cell.textLabel?.text = self.tempNotification.values.array[indexPath.row]["verb"] as NSString
-                cell.detailTextLabel?.text = self.tempNotification.values.array[indexPath.row]["displayName"] as NSString
             
             
-            cell.imageView?.image = imgNotification
+            cell.notificationImage.image = imgNotification
             
             cell.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(0.0)
             cell.separatorInset = UIEdgeInsets(top: 0.0, left: 15.0, bottom: 0.0, right: 15.0)
@@ -424,5 +434,18 @@ class SpaceTableViewCell: UITableViewCell {
     @IBOutlet weak var spaceImage: UIImageView!
 
 
+    
+}
+
+class NotificatioTableViewCell: UITableViewCell {
+    
+    
+    @IBOutlet weak var desc: UILabel!
+    @IBOutlet weak var title: UILabel!
+    @IBOutlet weak var data: UILabel!
+    
+    @IBOutlet weak var notificationImage: UIImageView!
+    
+    
     
 }

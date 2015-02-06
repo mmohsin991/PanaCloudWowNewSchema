@@ -903,6 +903,25 @@ class WowRef {
     }
     
     
+    func updateActiviy(spaceID:String, verb:String, displayName: String, actor: [String: AnyObject], object: [String: AnyObject],target :[String : AnyObject]){
+        let newActivityRef = WowRef.ref.childByAppendingPath("space-activity-streams/\(spaceID)").childByAutoId()
+        
+        var newActiviy = [String: AnyObject]()
+        
+        newActiviy["language"] = "en"
+        newActiviy["verb"] = verb
+        newActiviy["published"] = kFirebaseServerValueTimestamp
+        newActiviy["displayName"] = verb
+        newActiviy["actor"] = actor
+        newActiviy["object"] = object
+        newActiviy["target"] = target
+        
+        
+        newActivityRef.updateChildValues(newActiviy)
+        
+        
+    }
+    
 }
 
 
